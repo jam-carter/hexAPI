@@ -1,4 +1,0 @@
-User input ({"transactionId: "sku-001", "amount": "10"}) > routes > controller > use-case > repo > entity
-^ validates input > checks if 'sku-001' already exists in db > if it does add 10 more
-                                                             > if it doesn't create stock w/10 amount
-
