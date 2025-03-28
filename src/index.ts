@@ -9,6 +9,10 @@ const port = process.env.PORT || 8080;
 app.use(express.json());
 app.use("/", router);
 
+app.get("/", (_req, res) => {
+    res.send("HexAPI is Live");
+});
+
 app.get("/health", (_req, res) => { //'health' checking if the app is alive
     res.status(200).send({ status: "OK", message: "API is running" });
 });
