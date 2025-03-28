@@ -1,12 +1,14 @@
-import { Schema, model, models, Document } from "mongoose";
+import mongoose, { Schema, model, models, Document } from "mongoose";
 
 // Interface representing a processed transaction (used for idempotency)
 export interface IProcessedTransaction extends Document {
     transactionId: string;
+    type: "purchase" | "stock";
     response: {
         transactionId: string;
         version: number;
-        coins: number;
+        coins?: number;
+        amount?: number;
     };
 }
 
@@ -23,5 +25,6 @@ const processedTransactionSchema = new Schema<IProcessedTransaction>({
 });
 
 // Export the model (use existing if reloaded)
-export const ProcessedTransaction = models.ProcessedTransaction as ReturnType<typeof model<IProcessedTransaction>> ||
+export const ProcessedTransaction = models.ProcessedTransaction as mongoose.Model<IProcessedTransaction> ||
     model<IProcessedTransaction>("ProcessedTransaction", processedTransactionSchema);
+

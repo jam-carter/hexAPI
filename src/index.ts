@@ -1,7 +1,7 @@
 import express from "express";
 import { connectToMongoDB } from "./infrastructure/database/mongo";
 import router from './infrastructure/routes'
-import { ProcessedTransaction } from "./domain/entities/processedTransaction"
+import { ProcessedTransaction } from "./domain/entities/ProcessedTransaction"
 
 const app = express();
 const port = process.env.PORT || 8080;

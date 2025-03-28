@@ -1,4 +1,4 @@
-import { Product, IProduct } from "../../domain/entities/Product";
+import { Product, IProduct } from "../../domain/entities/product";
 import { ProcessedTransaction } from "../../domain/entities/ProcessedTransaction";
 
 /**
@@ -22,7 +22,7 @@ export class ProductRepository {
     }> {
         // Validate inputs
         if (!sku.trim()) throw new Error("SKU is missing or invalid.");
-        if (!Number.isFinite(amount) || amount <= 0) throw new Error("Invalid amount provided: ${amount}");
+        if (!Number.isFinite(amount) || amount <= 0) throw new Error(`Invalid amount provided: ${amount}`);
         if (!transactionId.trim()) throw new Error("TransactionId is missing or invalid.");
 
         // Check if this transaction was already processed
@@ -47,12 +47,12 @@ export class ProductRepository {
 
         if (!product) {
             product = new Product({ sku, amount, version: 1, lastTransactionId: transactionId });
-            console.log("New product created: ${sku}");
+            console.log(`New product created: ${sku}`);
         } else {
             product.amount += amount;
             product.version += 1;
             product.lastTransactionId = transactionId;
-            console.log("Updated stock for ${sku}: ${product.amount}");
+            console.log(`Updated stock for ${sku}: ${product.amount}`);
         }
 
         await product.save();
