@@ -9,5 +9,6 @@ router.post("/store/:sku/stock", addStockController);
 router.get("/store/:sku", getInventoryController);
 router.post("/store/:sku/purchase", purchaseController);
 
+router.post("/add-stock", addStockController); // Friendly version
 
 export default router;
