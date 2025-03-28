@@ -6,8 +6,7 @@ const addStockUseCase = new AddStock();
 // Adds stock to a product with idempotency
 export async function addStockController(req: Request, res: Response): Promise<void> {
     try {
-        const { transactionId, amount } = req.body;
-        const { sku } = req.params;
+        const { transactionId, amount, sku } = req.body;
 
         if (!transactionId) {
             throw new Error("Missing transactionId in request body.");
