@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGO_URI: string = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/store_db1";
+const MONGO_URI: string = process.env.MONGO_URI!;
 
 export async function connectToMongoDB(): Promise<void> {
     try {
