@@ -11,3 +11,5 @@ export async function connectToMongoDB(): Promise<void> {
         process.exit(1);
     }
 }
+
+//TO BE DELETED

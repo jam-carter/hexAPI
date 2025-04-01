@@ -1,11 +1,11 @@
-import { ProductRepository } from "../../infrastructure/database/ProductRepository";
-import { IProduct } from "../../domain/entities/product";
-import { ProcessedTransaction } from "../../domain/entities/ProcessedTransaction";
+import { ProductRepository } from "../../repository/inMemory/ProductRepository";
+import { IProduct } from "../models/product";
+import { ProcessedTransaction } from "../models/ProcessedTransaction";
 
 const productRepo = new ProductRepository();
 
 // Use case for purchasing stock from a product
-export class PurchaseStock {
+export class PurchaseStockHandler {
     async execute(sku: string, amount: number, transactionId: string): Promise<{
         product: IProduct;
         isDuplicate: boolean;

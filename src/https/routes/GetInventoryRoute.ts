@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { GetInventory } from "../../application/use-cases/GetInventory";
+import { GetInventoryHandler } from "../../domain/handlers/GetInventoryHandler";
 
-const getInventoryUseCase = new GetInventory();
+const getInventoryUseCase = new GetInventoryHandler();
 
 // Returns current inventory for a product
-export async function getInventoryController(req: Request, res: Response): Promise<void> {
+export async function getInventoryRoute(req: Request, res: Response): Promise<void> {
     try {
         const { sku } = req.params;
 

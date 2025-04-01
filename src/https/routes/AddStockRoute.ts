@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
-import { AddStock } from "../../application/use-cases/AddStock";
+import { AddStockHandler } from "../../domain/handlers/AddStockHandler";
 
-const addStockUseCase = new AddStock();
+const addStockUseCase = new AddStockHandler();
 
-// Adds stock to a product with idempotency
-export async function addStockController(req: Request, res: Response): Promise<void> {
+// move all req validation to top using Zod schema
+export async function addStockRoute(req: Request, res: Response): Promise<void> {
     try {
         const { transactionId, amount, sku } = req.body;
 
+        //changed to zod validation
         if (!transactionId) {
             throw new Error("Missing transactionId in request body.");
         }
@@ -29,3 +30,6 @@ export async function addStockController(req: Request, res: Response): Promise<v
         res.status(400).json({ error: error.message });
     }
 }
+
+//zod good for checking the data; no need to rewrite information guidelines in every file
+//essentially a checklist for data before its used

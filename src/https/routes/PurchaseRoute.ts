@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { PurchaseStock } from "../../application/use-cases/PurchaseStock";
+import { PurchaseStockHandler } from "../../domain/handlers/PurchaseStockHandler";
 
-const purchaseUseCase = new PurchaseStock();
+const purchaseUseCase = new PurchaseStockHandler();
 
 // Handles purchase requests
-export async function purchaseController(req: Request, res: Response): Promise<void> {
+export async function purchaseRoute(req: Request, res: Response): Promise<void> {
     try {
         const { transactionId } = req.body;
         const amount = req.body.amount ?? req.body.coins; // Support both field names

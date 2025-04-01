@@ -1,6 +1,5 @@
 import mongoose, { Schema, model, models, Document } from "mongoose";
 
-// Interface representing a processed transaction (used for idempotency)
 export interface IProcessedTransaction extends Document {
     transactionId: string;
     type: "purchase" | "stock";
@@ -12,7 +11,6 @@ export interface IProcessedTransaction extends Document {
     };
 }
 
-// Schema to track completed stock or purchase transactions
 const processedTransactionSchema = new Schema<IProcessedTransaction>({
     transactionId: { type: String, required: true, unique: true },
     type: { type: String, enum: ["purchase", "stock"], required: true },
@@ -24,7 +22,9 @@ const processedTransactionSchema = new Schema<IProcessedTransaction>({
     }
 });
 
-// Export the model (use existing if reloaded)
 export const ProcessedTransaction = models.ProcessedTransaction as mongoose.Model<IProcessedTransaction> ||
     model<IProcessedTransaction>("ProcessedTransaction", processedTransactionSchema);
 
+//again refactor for removal of mongoose/mongo
+//this file describes what a processedtran should look like to track and avoid dupes
+//updated version can be our inMemory reference
