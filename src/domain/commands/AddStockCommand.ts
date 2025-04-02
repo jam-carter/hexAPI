@@ -1,3 +1,9 @@
-//tells the app what needs to happen
+// this is just a typed object that tells us what the request wants to do
+// we’ll pass it into the handler to do the real work
 
-//define type for stated command (sku, amount, etc) > plain object - no methods > then passes to handler via routes
+export interface AddStockCommand {
+    sku: string;
+    amount: number;
+    transactionId: string;
+}
+

@@ -1,77 +1,68 @@
-import { Product, IProduct } from "../../domain/models/product";
-import { ProcessedTransaction } from "../../domain/models/ProcessedTransaction";
+import { IProduct } from "../../domain/models/Product";
+import { IProcessedTransaction } from "../../domain/models/ProcessedTransaction";
+
+// stores everything in memory
+const products = new Map<string, IProduct>();
+const processed = new Map<string, IProcessedTransaction>();
 
 export class ProductRepository {
-
-    //w/removal of mongo we rewrite; use a map that lives in memory
+    // find a product by sku
     async getProduct(sku: string): Promise<IProduct | null> {
-        return Product.findOne({ sku });
+        return products.get(sku) ?? null;
     }
 
-    //Adds stock to product
+    // add stock (with idempotency check)
     async addStock(sku: string, amount: number, transactionId: string): Promise<{
         product: IProduct;
         isNew: boolean;
         isDuplicate: boolean;
     }> {
-        // validation checks can be removed for v2, instead move them ro the route file and use zod
-        // afterwards this function simply assumes information is correct
-        if (!sku.trim()) throw new Error("SKU is missing or invalid.");
-        if (!Number.isFinite(amount) || amount <= 0) throw new Error(`Invalid amount provided: ${amount}`);
-        if (!transactionId.trim()) throw new Error("TransactionId is missing or invalid.");
-
-        // currently uses mongo, will need to change to a set/map instead w/inMem
-        const existing = await ProcessedTransaction.findOne({ transactionId, type: "stock" });
-        if (existing) {
+        // check if txn already happened
+        const existing = processed.get(transactionId);
+        if (existing && existing.type === "stock") {
             return {
                 product: {
                     sku,
-                    amount: existing.response.amount,
+                    amount: existing.response.amount ?? 0,
                     version: existing.response.version,
                     lastTransactionId: transactionId,
-                    _id: ""
-                } as IProduct,
+                },
                 isNew: false,
-                isDuplicate: true
+                isDuplicate: true,
             };
         }
 
-        // will be changed to finding/creating w/map
-        let product = await Product.findOne({ sku });
-        const isNew = !product;
+        const existingProduct = products.get(sku);
+        const isNew = !existingProduct;
 
-        if (!product) {
-            product = new Product({ sku, amount, version: 1, lastTransactionId: transactionId });
-            console.log(`New product created: ${sku}`);
-        } else {
-            product.amount += amount;
-            product.version += 1;
-            product.lastTransactionId = transactionId;
-            console.log(`Updated stock for ${sku}: ${product.amount}`);
-        }
+        const product: IProduct = existingProduct
+            ? {
+                ...existingProduct,
+                amount: existingProduct.amount + amount,
+                version: existingProduct.version + 1,
+                lastTransactionId: transactionId,
+            }
+            : {
+                sku,
+                amount,
+                version: 1,
+                lastTransactionId: transactionId,
+            };
 
-        //updates map value in v2
-        await product.save();
+        // save to pretend DB
+        products.set(sku, product);
 
-        //use a set or map in v2
-        await ProcessedTransaction.create({
+        // record the txn so we don’t run it again
+        processed.set(transactionId, {
             transactionId,
             type: "stock",
             response: {
                 transactionId,
                 version: product.version,
-                amount: product.amount
-            }
+                amount: product.amount,
+            },
         });
 
         return { product, isNew, isDuplicate: false };
     }
-
-    // re-write to clean our map inMem
-    async clearAll(): Promise<void> {
-        await Product.deleteMany({});
-    }
 }
-
-//map allows very quickly access -- store product data
-//set wont let us have the same thing twice -- track used transactions

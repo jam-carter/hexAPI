@@ -1,35 +1,42 @@
 import { Request, Response } from "express";
 import { AddStockHandler } from "../../domain/handlers/AddStockHandler";
+import { z } from "zod";
 
-const addStockUseCase = new AddStockHandler();
+// checklist; make sure the request body is valid before we pass it to the handler
+const AddStockSchema = z.object({
+    sku: z.string(),
+    amount: z.number().positive(),
+    transactionId: z.string().min(1),
+});
 
-// move all req validation to top using Zod schema
-export async function addStockRoute(req: Request, res: Response): Promise<void> {
+const handler = new AddStockHandler();
+
+// this route handles post
+export const addStockRoute = async (req: Request, res: Response): Promise<void> => {
+    // validate request body
+    const result = AddStockSchema.safeParse(req.body);
+
+    if (!result.success) {
+        return res.status(400).json({ error: result.error.flatten() });
+    }
+
+    const command = result.data;
+
     try {
-        const { transactionId, amount, sku } = req.body;
-
-        //changed to zod validation
-        if (!transactionId) {
-            throw new Error("Missing transactionId in request body.");
-        }
-
-        const { product, isNew, isDuplicate } = await addStockUseCase.execute(sku, amount, transactionId);
+        const { product, isNew, isDuplicate } = await handler.execute(command);
 
         const statusCode = isNew ? 201 : 202;
 
-        // Return stock response (duplicate check handled in message)
         res.status(statusCode).json({
-            transactionId,
+            transactionId: command.transactionId,
             version: product.version,
             amount: product.amount,
-            ...(isDuplicate && { message: "Duplicate stock transaction" })
+            message: "Stock added",
+            ...(isDuplicate && { message: "Duplicate stock transaction" }),
         });
 
-    } catch (error: any) {
-        console.error("Error in AddStockController:", error.message);
-        res.status(400).json({ error: error.message });
+    } catch (err: any) {
+        console.error("addStock error:", err.message);
+        res.status(500).json({ error: err.message });
     }
-}
-
-//zod good for checking the data; no need to rewrite information guidelines in every file
-//essentially a checklist for data before its used
+};

@@ -1,3 +1,16 @@
-//blueprint for the house
+import express from "express";
+import router from "./https/routes"; // central route entrypoint
 
-//import express/routes > express instance > middleware (express.json) > router usage (app.use()) > export for use in main
+export const app = express();
+
+app.use(express.json());
+
+app.use("/", router);
+
+app.get("/", (_req, res) => {
+    res.send("HexAPI is live");
+});
+
+app.get("/health", (_req, res) => {
+    res.status(200).send({ status: "ok", message: "API is running" });
+});
