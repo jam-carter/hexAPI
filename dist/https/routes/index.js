@@ -2,13 +2,9 @@ import { Router } from "express";
 import { addStockRoute } from "./AddStockRoute.js";
 import { getInventoryRoute } from "./GetInventoryRoute.js";
 import { purchaseStockRoute } from "./PurchaseStockRoute.js";
-
 const router = Router();
-
 router.post("/store/:sku/stock", addStockRoute);
 router.get("/store/:sku", getInventoryRoute);
 router.post("/store/:sku/purchase", purchaseStockRoute);
-
 router.post("/add-stock", addStockRoute);
-
 export default router;

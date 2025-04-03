@@ -1,12 +1,18 @@
-FROM node:18
+# Use official Node image
+FROM node:20-alpine
 
+# Create app directory
 WORKDIR /app
 
+# Install dependencies first (uses Docker cache)
 COPY package*.json ./
 RUN npm install
 
+# Copy source code
 COPY . .
 
-EXPOSE 8080
+# Build TypeScript -> JavaScript
+RUN npm run build
 
-CMD ["npm", "run", "dev", "start"]
+# Default command (run compiled JS)
+CMD ["npm", "start"]

@@ -19,7 +19,7 @@
 					}
 				},
 				{
-					"listen": "prerequest",
+					"listen": "pre-request",
 					"script": {
 						"exec": [
 							"var uuid = require('uuid');",

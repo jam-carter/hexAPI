@@ -1,30 +1,38 @@
-import mongoose, { Schema, model, models, Document } from "mongoose";
-
-export interface IProcessedTransaction extends Document {
+interface AmountResponse {
     transactionId: string;
-    type: "purchase" | "stock";
-    response: {
-        transactionId: string;
-        version: number;
-        coins?: number;
-        amount?: number;
-    };
+    version: number;
+    amount: number;
 }
 
-const processedTransactionSchema = new Schema<IProcessedTransaction>({
+interface CoinsResponse {
+    transactionId: string;
+    version: number;
+    coins: number;
+}
+
+export type TransactionResponse = AmountResponse | CoinsResponse;
+
+export interface IProcessedTransaction {
+    transactionId: string;
+    type: "purchase" | "stock";
+    response: TransactionResponse;
+}
+
+const responseSchema = new Schema(
+    {
+        transactionId: { type: String, required: true },
+        version: { type: Number, required: true },
+        coins: Number,
+        amount: Number
+    },
+    { _id: false }
+);
+
+const processedTransactionSchema = new Schema({
     transactionId: { type: String, required: true, unique: true },
     type: { type: String, enum: ["purchase", "stock"], required: true },
-    response: {
-        transactionId: String,
-        version: Number,
-        coins: Number,
-        amount: Number // Optional: supports both coins and amount
-    }
+    response: { type: responseSchema, required: true }
 });
 
-export const ProcessedTransaction = models.ProcessedTransaction as mongoose.Model<IProcessedTransaction> ||
-    model<IProcessedTransaction>("ProcessedTransaction", processedTransactionSchema);
-
-//again refactor for removal of mongoose/mongo
-//this file describes what a processedtran should look like to track and avoid dupes
-//updated version can be our inMemory reference
+export const ProcessedTransaction =
+    models.ProcessedTransaction ?? model("ProcessedTransaction", processedTransactionSchema);

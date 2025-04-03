@@ -1,18 +1,12 @@
-import { AddStockCommand } from "../commands/AddStockCommand";
-import { IProduct } from "../models/product";
 import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
-
 // handles the logic for adding stock
 export class AddStockHandler {
-    constructor(private productRepo: ProductRepository = new ProductRepository()) {}
-
-    async execute(command: AddStockCommand): Promise<{
-        product: IProduct;
-        isNew: boolean;
-        isDuplicate: boolean;
-    }> {
+    productRepo;
+    constructor(productRepo = new ProductRepository()) {
+        this.productRepo = productRepo;
+    }
+    async execute(command) {
         // assumes validation already happened at the route layer
-
         // forward to repo to handle add stock + idempotency
         return this.productRepo.addStock(command.sku, command.amount, command.transactionId);
     }

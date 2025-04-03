@@ -1,23 +1,17 @@
-import { PurchaseCommand } from "../commands/PurchaseCommand";
-import { IProduct } from "../models/product";
 import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
-
 export class PurchaseStockHandler {
-    constructor(private productRepo: ProductRepository = new ProductRepository()) {}
-
-    async execute(command: PurchaseCommand): Promise<{
-        product: IProduct;
-        isNew: boolean;
-        isDuplicate: boolean;
-    }> {
+    productRepo;
+    constructor(productRepo = new ProductRepository()) {
+        this.productRepo = productRepo;
+    }
+    async execute(command) {
         const { sku, amount, coins, transactionId } = command;
-        const value = amount ?? coins!;
-
+        const value = amount ?? coins;
         const existingTxn = await this.productRepo.getProcessedTransaction(transactionId);
         if (existingTxn) {
             const product = await this.productRepo.getProduct(sku);
-            if (!product) throw new Error(`Product with SKU '${sku}' not found`);
-
+            if (!product)
+                throw new Error(`Product with SKU '${sku}' not found`);
             return {
                 product: {
                     ...product,
@@ -29,15 +23,14 @@ export class PurchaseStockHandler {
                 isDuplicate: true
             };
         }
-
         const product = await this.productRepo.getProduct(sku);
-        if (!product) throw new Error(`Product with SKU '${sku}' not found`);
-        if (product.amount < value) throw new Error("Not enough stock");
-
+        if (!product)
+            throw new Error(`Product with SKU '${sku}' not found`);
+        if (product.amount < value)
+            throw new Error("Not enough stock");
         product.amount -= value;
         product.version += 1;
         product.lastTransactionId = transactionId;
-
         await this.productRepo.saveProduct(product);
         await this.productRepo.saveProcessedTransaction({
             transactionId,
@@ -48,7 +41,6 @@ export class PurchaseStockHandler {
                 coins: value,
             }
         });
-
         return {
             product,
             isNew: false,
