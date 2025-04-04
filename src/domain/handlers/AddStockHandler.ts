@@ -1,19 +1,21 @@
-import { AddStockCommand } from "../commands/AddStockCommand";
-import { IProduct } from "../models/product";
-import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
+import type { AddStockCommand } from "../commands/AddStockCommand";
+import type { IProduct } from "../models/product";
+import { ProductRepository } from "../../repository/inMemory/ProductRepository";
 
-// handles the logic for adding stock
-export class AddStockHandler {
-    constructor(private productRepo: ProductRepository = new ProductRepository()) {}
-
-    async execute(command: AddStockCommand): Promise<{
+// just the methods this handler needs
+export interface AddStockPort {
+    addStock(sku: string, amount: number, transactionId: string): Promise<{
         product: IProduct;
         isNew: boolean;
         isDuplicate: boolean;
-    }> {
-        // assumes validation already happened at the route layer
+    }>;
+}
 
-        // forward to repo to handle add stock + idempotency
+// handler depends on the port interface
+export class AddStockHandler {
+    constructor(private productRepo: AddStockPort = new ProductRepository()) {}
+
+    async execute(command: AddStockCommand) {
         return this.productRepo.addStock(command.sku, command.amount, command.transactionId);
     }
 }

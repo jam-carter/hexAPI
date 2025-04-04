@@ -8,7 +8,9 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "verbatimModuleSyntax": true
   },
-  "include": ["src", "config"]
+  "include": [ "src", "config", "tests" ]
 }

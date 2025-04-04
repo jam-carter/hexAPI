@@ -1,5 +1,5 @@
-import { IProduct } from "../../domain/models/product.js";
-import { IProcessedTransaction } from "../../domain/models/ProcessedTransaction.js";
+import type { IProduct } from "../../domain/models/product";
+import type { IProcessedTransaction } from "../../domain/models/ProcessedTransaction";
 
 // in-memory store
 const products = new Map<string, IProduct>();

@@ -1,4 +1,4 @@
-import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
+import { ProductRepository } from "../../repository/inMemory/ProductRepository";
 const productRepo = new ProductRepository();
 // Use case for retrieving current inventory of a product
 export class GetInventoryHandler {

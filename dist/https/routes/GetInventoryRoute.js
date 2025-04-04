@@ -1,4 +1,4 @@
-import { GetInventoryHandler } from "../../domain/handlers/GetInventoryHandler.js";
+import { GetInventoryHandler } from "../../domain/handlers/GetInventoryHandler";
 const handler = new GetInventoryHandler();
 export const getInventoryRoute = async (req, res) => {
     const sku = req.params.sku;

@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { AddStockHandler } from "../../domain/handlers/AddStockHandler.js";
-import { z } from "zod";
+import type { Request, Response } from "express";
+import  { AddStockHandler } from "../../domain/handlers/AddStockHandler";
+import  { z } from "zod";
 
 const AddStockSchema = z.object({
     sku: z.string(),

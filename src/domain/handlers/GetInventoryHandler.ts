@@ -1,5 +1,5 @@
-import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
-import { IProduct } from "../models/product";
+import { ProductRepository } from "../../repository/inMemory/ProductRepository";
+import type { IProduct } from "../models/product";
 
 const productRepo = new ProductRepository();
 

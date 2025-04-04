@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { addStockRoute } from "./AddStockRoute.js";
-import { getInventoryRoute } from "./GetInventoryRoute.js";
-import { purchaseStockRoute } from "./PurchaseStockRoute.js";
+import { addStockRoute } from "./AddStockRoute";
+import { getInventoryRoute } from "./GetInventoryRoute";
+import { purchaseStockRoute } from "./PurchaseStockRoute";
 
 const router = Router();
 

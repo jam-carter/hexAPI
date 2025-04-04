@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
-import { PurchaseStockHandler } from "../../domain/handlers/PurchaseStockHandler.js";
+import { PurchaseStockHandler } from "../../domain/handlers/PurchaseStockHandler";
 
 const SchemaWithCoins = z.object({
     sku: z.string(),

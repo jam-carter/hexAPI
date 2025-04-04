@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { GetInventoryHandler } from "../../domain/handlers/GetInventoryHandler.js";
+import type { Request, Response } from "express";
+import { GetInventoryHandler } from "../../domain/handlers/GetInventoryHandler";
 
 const handler = new GetInventoryHandler();
 

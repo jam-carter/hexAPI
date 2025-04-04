@@ -1,6 +1,6 @@
-import { PurchaseCommand } from "../commands/PurchaseCommand";
-import { IProduct } from "../models/product";
-import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
+import type { PurchaseCommand } from "../commands/PurchaseCommand";
+import type { IProduct } from "../models/product";
+import { ProductRepository } from "../../repository/inMemory/ProductRepository";
 
 export class PurchaseStockHandler {
     constructor(private productRepo: ProductRepository = new ProductRepository()) {}

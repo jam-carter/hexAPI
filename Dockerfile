@@ -14,5 +14,6 @@ COPY . .
 # Build TypeScript -> JavaScript
 RUN npm run build
 
+
 # Default command (run compiled JS)
 CMD ["npm", "start"]

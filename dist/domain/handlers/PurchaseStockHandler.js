@@ -1,4 +1,4 @@
-import { ProductRepository } from "../../repository/inMemory/ProductRepository.js";
+import { ProductRepository } from "../../repository/inMemory/ProductRepository";
 export class PurchaseStockHandler {
     productRepo;
     constructor(productRepo = new ProductRepository()) {
