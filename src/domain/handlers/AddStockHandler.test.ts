@@ -1,6 +1,6 @@
 import type { AddStockPort } from "./AddStockHandler";
 import type { AddStockCommand } from "../commands/AddStockCommand";
-import { AddStockHandler, } from "./AddStockHandler";
+import { AddStockHandler } from "./AddStockHandler";
 
 describe("AddStockHandler", () => {
     let fakeRepo: AddStockPort;

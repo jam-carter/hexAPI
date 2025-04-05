@@ -24,6 +24,7 @@ export class PurchaseStockHandler {
                     amount: "amount" in existingTxn.response
                         ? existingTxn.response.amount
                         : existingTxn.response.coins,
+                    version: existingTxn.response.version,
                 },
                 isNew: false,
                 isDuplicate: true
@@ -45,7 +46,7 @@ export class PurchaseStockHandler {
             response: {
                 transactionId,
                 version: product.version,
-                coins: value,
+                coins: product.amount, // Store current amount left
             }
         });
 

@@ -10,7 +10,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./src",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": false
   },
   "include": [ "src", "config", "tests" ]
 }

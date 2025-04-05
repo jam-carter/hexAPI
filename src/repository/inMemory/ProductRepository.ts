@@ -15,6 +15,10 @@ export class ProductRepository {
         isNew: boolean;
         isDuplicate: boolean;
     }> {
+        if (amount <= 0 ) {
+            throw new Error("Invalid amount");
+        }
+
         if (processedTransactions.has(transactionId)) {
             const existing = processedTransactions.get(transactionId)!;
             const product = products.get(sku)!;
