@@ -61,3 +61,4 @@ describe("addStockRoute", () => {
         expect(response.body).toHaveProperty("error");
     });
 });
+

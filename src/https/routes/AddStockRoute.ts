@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import  { AddStockHandler } from "../../domain/handlers/AddStockHandler";
-import  { z } from "zod";
+import { InventoryHandler } from "../../domain/handlers/InventoryHandler";
+import { z } from "zod";
 
 const AddStockSchema = z.object({
     sku: z.string(),
@@ -8,12 +8,9 @@ const AddStockSchema = z.object({
     transactionId: z.string().min(1),
 });
 
-const handler = new AddStockHandler();
+const handler = new InventoryHandler();
 
-export const addStockRoute = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export async function addStockRoute(req: Request, res: Response): Promise<void> {
     const sku = req.params.sku;
     const result = AddStockSchema.safeParse({ ...req.body, sku });
 
@@ -25,7 +22,7 @@ export const addStockRoute = async (
     const command = result.data;
 
     try {
-        const { product, isNew, isDuplicate } = await handler.execute(command);
+        const { product, isNew, isDuplicate } = await handler.addStock(command);
 
         const statusCode = isDuplicate ? 202 : isNew ? 201 : 200;
 
@@ -39,4 +36,4 @@ export const addStockRoute = async (
         console.error("addStock error:", err.message);
         res.status(500).json({ error: err.message });
     }
-};
+}
