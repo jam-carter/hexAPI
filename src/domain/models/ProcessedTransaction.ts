@@ -12,7 +12,7 @@ interface CoinsResponse {
 
 export type TransactionResponse = AmountResponse | CoinsResponse;
 
-export interface IProcessedTransaction {
+export interface ProcessedTransaction {
     transactionId: string;
     type: "purchase" | "stock";
     response: TransactionResponse;

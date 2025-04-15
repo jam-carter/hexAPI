@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { GetInventoryHandler } from "../../domain/handlers/GetInventoryHandler";
+import { InventoryHandler } from "../../domain/handlers/InventoryHandler";
 
-const handler = new GetInventoryHandler();
+const handler = new InventoryHandler();
 
 export const getInventoryRoute = async (
     req: Request,

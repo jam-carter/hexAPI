@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { PurchaseStockHandler } from "../../domain/handlers/PurchaseStockHandler";
+import { InventoryHandler } from "../../domain/handlers/InventoryHandler";
 
 const SchemaWithCoins = z.object({
     sku: z.string(),
@@ -14,7 +14,7 @@ const SchemaWithAmount = z.object({
     transactionId: z.string().min(1),
 });
 
-const handler = new PurchaseStockHandler();
+const handler = new InventoryHandler();
 
 export const purchaseStockRoute = async (
     req: Request,

@@ -1,24 +1,17 @@
-import type { IProduct } from "../../domain/models/product";
-import type { IProcessedTransaction } from "../../domain/models/ProcessedTransaction";
+import type { Product } from "../../domain/models/product";
+import type { ProcessedTransaction } from "../../domain/models/ProcessedTransaction";
 
 // in-memory store
-const products = new Map<string, IProduct>();
-const processedTransactions = new Map<string, IProcessedTransaction>();
+const products = new Map<string, Product>();
+const processedTransactions = new Map<string, ProcessedTransaction>();
 
 export class ProductRepository {
-    async getProduct(sku: string): Promise<IProduct | null> {
-        return products.get(sku) || null;
-    }
 
     async addStock(sku: string, amount: number, transactionId: string): Promise<{
-        product: IProduct;
+        product: Product;
         isNew: boolean;
         isDuplicate: boolean;
     }> {
-        if (amount <= 0 ) {
-            throw new Error("Invalid amount");
-        }
-
         if (processedTransactions.has(transactionId)) {
             const existing = processedTransactions.get(transactionId)!;
             const product = products.get(sku)!;
@@ -67,18 +60,6 @@ export class ProductRepository {
         });
 
         return { product, isNew, isDuplicate: false };
-    }
-
-    async getProcessedTransaction(transactionId: string): Promise<IProcessedTransaction | undefined> {
-        return processedTransactions.get(transactionId);
-    }
-
-    async saveProduct(product: IProduct): Promise<void> {
-        products.set(product.sku, product);
-    }
-
-    async saveProcessedTransaction(txn: IProcessedTransaction): Promise<void> {
-        processedTransactions.set(txn.transactionId, txn);
     }
 
     async clearAll(): Promise<void> {
