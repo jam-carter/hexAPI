@@ -1,8 +1,10 @@
-import { AddStockHandler, AddStockPort } from "./AddStockHandler.js";
-import { AddStockCommand } from "../commands/AddStockCommand.js";
-describe("AddStockHandler", () => {
-    let fakeRepo;
-    let handler;
+import { InventoryHandler } from "./InventoryHandler";
+import { AddStockCommand } from "../commands/AddStockCommand";
+
+describe("InventoryHandler.addStock", () => {
+    let fakeRepo: { addStock: jest.Mock };
+    let handler: InventoryHandler;
+
     beforeEach(() => {
         fakeRepo = {
             addStock: jest.fn().mockResolvedValue({
@@ -11,16 +13,20 @@ describe("AddStockHandler", () => {
                 isDuplicate: false,
             }),
         };
-        handler = new AddStockHandler(fakeRepo);
+
+        handler = new InventoryHandler(fakeRepo as any);
     });
+
     it("should add stock correctly", async () => {
-        const command = {
+        const command: AddStockCommand = {
             sku: "123",
             amount: 50,
             transactionId: "tx123",
         };
-        const result = await handler.execute(command);
+
+        const result = await handler.addStock(command);
+
         expect(result.product.amount).toBe(150);
-        expect(fakeRepo.addStock.mock.calls.length).toBe(1);
+        expect(fakeRepo.addStock).toHaveBeenCalledTimes(1);
     });
 });
