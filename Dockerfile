@@ -14,6 +14,8 @@ COPY . .
 # Build TypeScript -> JavaScript
 RUN npm run build
 
+# Expose the app's port
+EXPOSE 8080
 
 # Default command (run compiled JS)
 CMD ["npm", "start"]

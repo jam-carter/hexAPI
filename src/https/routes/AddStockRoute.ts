@@ -1,39 +1,40 @@
-import type { Request, Response } from "express";
-import { InventoryHandler } from "../../domain/handlers/InventoryHandler";
+import { Router, Response, Request } from "express";
+import { InventoryHandler } from "../../domain/handlers/InventoryHandler.js";
+import { sharedEventStore } from "../../config/dependencies.js";
 import { z } from "zod";
 
+const router = Router();
+const handler = new InventoryHandler(sharedEventStore);
+
 const AddStockSchema = z.object({
-    sku: z.string(),
     amount: z.number().positive(),
     transactionId: z.string().min(1),
 });
 
-const handler = new InventoryHandler();
-
-export async function addStockRoute(req: Request, res: Response): Promise<void> {
+router.post("/:sku/stock", async (req: Request, res: Response ): Promise<void> => {
     const sku = req.params.sku;
-    const result = AddStockSchema.safeParse({ ...req.body, sku });
+    const parsed = AddStockSchema.safeParse(req.body);
 
-    if (!result.success) {
-        res.status(400).json({ error: result.error.flatten() });
-        return;
+    if (!parsed.success) {
+        res.status(400).json({ message: "❌ Invalid stock data" });
+        return
     }
 
-    const command = result.data;
+    const { amount, transactionId } = parsed.data;
 
     try {
-        const { product, isNew, isDuplicate } = await handler.addStock(command);
+        const result = await handler.execute({ sku, amount, transactionId });
 
-        const statusCode = isDuplicate ? 202 : isNew ? 201 : 200;
+        const { isDuplicate, ...responseBody } = result;
+        const status = isDuplicate ? 202 : 201;
 
-        res.status(statusCode).json({
-            transactionId: command.transactionId,
-            version: product.version,
-            amount: product.amount,
-            message: isDuplicate ? "Duplicate stock transaction" : "Stock added",
-        });
-    } catch (err: any) {
-        console.error("addStock error:", err.message);
-        res.status(500).json({ error: err.message });
+        res.status(status).json(responseBody);
+        return
+    } catch (err) {
+        console.error("Failed to add stock:", err);
+        res.status(500).json({ message: "Internal server error" });
+        return
     }
-}
+});
+
+export default router;
