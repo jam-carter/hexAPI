@@ -1,3 +1,3 @@
-import { EventStore } from "../repository/inMemory/EventStore.js";
+import { InMemoryEventStore } from "../repository/inMemory/EventStore.js";
 
-export const sharedEventStore = new EventStore();
+export const sharedEventStore = new InMemoryEventStore();
