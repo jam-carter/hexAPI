@@ -16,7 +16,7 @@ router.post("/:sku/stock", async (req: Request, res: Response ): Promise<void> =
     const parsed = AddStockSchema.safeParse(req.body);
 
     if (!parsed.success) {
-        res.status(400).json({ message: "❌ Invalid stock data" });
+        res.status(400).json({ message: "Invalid stock data" });
         return
     }
 
