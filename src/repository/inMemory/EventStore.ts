@@ -1,27 +1,36 @@
 import type { Event } from "../../domain/models/Event";
+import type { ProductState } from "../../domain/services/Ledger";
+import { updateState } from "../../domain/services/Ledger";
 
-export class EventStore {
-    private events: Map<string, Event[]> = new Map(); // key = sku
+export interface EventStore {
+    saveTransactions(events: Event[]): void;
+    loadLatestState(sku: string): ProductState;
+}
 
-    append(event: Event): void {
-        const skuEvents = this.events.get(event.sku) || [];
-        skuEvents.push(event);
-        this.events.set(event.sku, skuEvents);
+export class InMemoryEventStore implements EventStore {
+    private events: Event[] = [];
+    private states: Record<string, ProductState> = {};
+    private transactionsSeen: Set<string> = new Set();
+
+    saveTransactions(events: Event[]): void {
+        for (const event of events) {
+            if (this.transactionsSeen.has(event.transactionId)) {
+                throw new Error(`Duplicate transactionId: ${event.transactionId}`);
+            }
+
+            const currentState = this.states[event.sku] || { version: 0, stockCount: 0 };
+            const updatedState = updateState(currentState, event);
+
+            this.states[event.sku] = updatedState;
+            this.events.push(event);
+            this.transactionsSeen.add(event.transactionId);
+        }
     }
 
+    loadLatestState(sku: string): ProductState {
+        return this.states[sku] || { version: 0, stockCount: 0 };
+    }
     getEventsForSKU(sku: string): Event[] {
-        return this.events.get(sku) || [];
-    }
-
-    getAllEvents(): Event[] {
-        return Array.from(this.events.values()).flat();
-    }
-
-    hasTransaction(transactionId: string): boolean {
-        return this.getAllEvents().some((event) => event.transactionId === transactionId);
-    }
-
-    getEventByTransactionId(transactionId: string): Event | undefined {
-        return this.getAllEvents().find((event) => event.transactionId === transactionId);
+        return this.events.filter(event => event.sku === sku);
     }
 }
