@@ -1,16 +1,16 @@
 import type { EventStore } from "../../repository/inMemory/EventStore";
-import { replayLedger } from "../services/Ledger.js";
 import type { Event } from "../models/Event";
+import { AddStockSchema } from "../commands/AddStockCommand";
+import { PurchaseSchema } from "../commands/PurchaseCommand";
 
 export class InventoryHandler {
     constructor(private eventStore: EventStore) {}
 
-    // Used by POST /store/:sku/stock
-    async execute({
-                      sku,
-                      amount,
-                      transactionId,
-                  }: {
+    async handleAddStock({
+                             sku,
+                             amount,
+                             transactionId,
+                         }: {
         sku: string;
         amount: number;
         transactionId: string;
@@ -18,72 +18,64 @@ export class InventoryHandler {
         transactionId: string;
         version: number;
         amount: number;
-        isDuplicate: boolean;
     }> {
-        const isDuplicate = this.eventStore.hasTransaction(transactionId);
-
-        if (!isDuplicate) {
-            const newEvent: Event = {
-                type: "StockAdded",
-                sku,
-                amount,
-                transactionId,
-                timestamp: new Date().toISOString(),
-            };
-            this.eventStore.append(newEvent);
-            console.log("Event Ledger:", this.eventStore.getAllEvents());
+        const validationResult = AddStockSchema.safeParse({ sku, amount, transactionId });
+        if (!validationResult.success) {
+            throw new Error(`AddStockCommand validation failed: ${validationResult.error}`);
         }
 
-        const currentEvents = this.eventStore.getEventsForSKU(sku);
-        const productState = replayLedger(currentEvents);
+        const newEvent: Event = {
+            type: "StockAdded",
+            sku,
+            amount,
+            transactionId,
+            timestamp: new Date().toISOString(),
+        };
+
+        this.eventStore.saveTransactions([newEvent]);
+
+        // ✅ NEW: use latest state, not replay
+        const state = this.eventStore.loadLatestState(sku);
+
         return {
-            transactionId: transactionId,
-            version: productState.version,
-            amount: productState.amount,
-            isDuplicate,
+            transactionId,
+            version: state.version,
+            amount: state.stockCount,
         };
     }
 
-    // Used by GET /store/:sku
     get(sku: string): { transactionId: string; version: number; amount: number } | undefined {
-        const events = this.eventStore.getEventsForSKU(sku);
-        if (!events.length) return undefined;
+        const state = this.eventStore.loadLatestState(sku);
+        if (!state) return undefined;
 
-        return replayLedger(events);
+        return {
+            transactionId: "latest", // optional: you could drop this if not used
+            version: state.version,
+            amount: state.stockCount,
+        };
     }
 
-    // Used by POST /store/:sku/purchase
-    async purchase({
-                       sku,
-                       amount,
-                       transactionId,
-                   }: {
+    async handleMakePurchase({
+                                 sku,
+                                 amount,
+                                 transactionId,
+                             }: {
         sku: string;
         amount: number;
         transactionId: string;
-    }): Promise<
-        | { transactionId: string; version: number; coins: number; isDuplicate: true }
-        | { transactionId: string; version: number; coins: number; isDuplicate: false }
-    > {
-        const isDuplicate = this.eventStore.hasTransaction(transactionId);
-
-        if (isDuplicate) {
-            const existingEvent = this.eventStore.getEventByTransactionId(transactionId)!;
-            const events = this.eventStore.getEventsForSKU(sku);
-            const state = replayLedger(events);
-
-            return {
-                transactionId: existingEvent.transactionId,
-                version: state.version,
-                coins: state.amount,
-                isDuplicate: true,
-            };
+    }): Promise<{
+        transactionId: string;
+        version: number;
+        coins: number;
+    }> {
+        const validationResult = PurchaseSchema.safeParse({ sku, amount, transactionId });
+        if (!validationResult.success) {
+            throw new Error(`PurchaseCommand validation failed: ${validationResult.error}`);
         }
 
-        const events = this.eventStore.getEventsForSKU(sku);
-        const state = replayLedger(events);
+        const currentState = this.eventStore.loadLatestState(sku);
 
-        if (amount > state.amount) {
+        if (amount > currentState.stockCount) {
             throw new Error("Not enough inventory");
         }
 
@@ -94,17 +86,15 @@ export class InventoryHandler {
             transactionId,
             timestamp: new Date().toISOString(),
         };
-        this.eventStore.append(newEvent);
-        console.log("Event Ledger:", this.eventStore.getAllEvents());
 
-        const updatedEvents = this.eventStore.getEventsForSKU(sku);
-        const newState = replayLedger(updatedEvents);
+        this.eventStore.saveTransactions([newEvent]);
+
+        const updatedState = this.eventStore.loadLatestState(sku);
 
         return {
             transactionId,
-            version: newState.version,
-            coins: newState.amount,
-            isDuplicate: false,
+            version: updatedState.version,
+            coins: updatedState.stockCount,
         };
     }
 }
