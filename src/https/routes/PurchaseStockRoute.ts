@@ -27,9 +27,9 @@ export const purchaseStockRoute = async (
     const value = amount ?? coins!;
 
     try {
-        const result = await handler.purchase({ sku, transactionId, amount: value });
+        const result = await handler.handleMakePurchase({ sku, transactionId, amount: value });
 
-        const status = result.isDuplicate ? 202 : 201;
+        const status = 201;
         res.status(status).json({
             transactionId: result.transactionId,
             version: result.version,

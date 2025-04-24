@@ -23,10 +23,8 @@ router.post("/:sku/stock", async (req: Request, res: Response ): Promise<void> =
     const { amount, transactionId } = parsed.data;
 
     try {
-        const result = await handler.execute({ sku, amount, transactionId });
-
-        const { isDuplicate, ...responseBody } = result;
-        const status = isDuplicate ? 202 : 201;
+        const responseBody = await handler.handleAddStock({sku, amount, transactionId});
+        const status = 201;
 
         res.status(status).json(responseBody);
         return
