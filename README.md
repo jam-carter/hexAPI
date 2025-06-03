@@ -1,5 +1,14 @@
-└── tests/             # Test files (optional)
-```
+# hexAPI-v2
+
+A Dockerized, hexagonal-architecture REST API for managing product stock and purchase transactions — built with TypeScript, Express, and in-memory storage. Includes idempotency logic and automated Postman testing.
+
+## Features
+
+- **Idempotent operations** for adding stock and making purchases
+- **Hexagonal architecture**: clean separation of domain, application, and infrastructure
+- **Postman testing suite** integrated via bash script
+- **Dockerized** for isolated, reproducible builds
+- Input validation using Zod
 
 ## 🧪 Running Tests
 
@@ -17,7 +26,7 @@ This script:
 
 Make sure Docker is running before executing the script.
 
-## 🐳 Running Locally with Docker
+## Running Locally with Docker
 
 ```bash
 docker-compose up --build
@@ -25,7 +34,7 @@ docker-compose up --build
 
 This spins up both the API server and runs it at `http://localhost:3000`.
 
-## 📫 API Endpoints
+## API Endpoints
 
 ### `GET /products/:sku`
 Returns current stock level for the product.
@@ -52,7 +61,7 @@ Attempts to purchase stock from a SKU. Requires:
 
 Idempotency is enforced via `transactionId`.
 
-## 🛠 Technologies
+## Technologies
 
 - TypeScript
 - Express.js
@@ -60,18 +69,18 @@ Idempotency is enforced via `transactionId`.
 - Docker + Docker Compose
 - Postman + Newman
 
-## 📚 Architecture Principles
+## Architecture Principles
 
 - **Hexagonal Architecture**: decouples core business logic from frameworks and infrastructure.
 - **CQRS-like Separation**: read (`GET`) and write (`POST`) operations handled distinctly.
 - **Idempotency Layer**: prevents duplicate operations via `ProcessedTransaction` record.
 
-## 📌 Future Improvements
+## Future Improvements
 
 - Add persistent database (e.g. PostgreSQL or MongoDB)
 - Separate read/write models using full CQRS
 - Add integration + unit test coverage via Jest/Supertest
 
-## 👤 Author
+## Author
 
 Built by Jamaul Aaron
