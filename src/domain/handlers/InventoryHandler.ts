@@ -34,7 +34,6 @@ export class InventoryHandler {
 
         this.eventStore.saveTransactions([newEvent]);
 
-        // ✅ NEW: use latest state, not replay
         const state = this.eventStore.loadLatestState(sku);
 
         return {
